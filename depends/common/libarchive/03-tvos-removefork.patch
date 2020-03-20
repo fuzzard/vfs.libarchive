@@ -1,0 +1,27 @@
+--- a/libarchive/filter_fork_posix.c
++++ b/libarchive/filter_fork_posix.c
+@@ -32,6 +32,11 @@
+ 
+ __FBSDID("$FreeBSD: head/lib/libarchive/filter_fork.c 182958 2008-09-12 05:33:00Z kientzle $");
+ 
++#ifdef TARGET_DARWIN_TVOS
++#undef HAVE_POSIX_SPAWNP
++#undef HAVE_VFORK
++#endif
++
+ #if defined(HAVE_SYS_TYPES_H)
+ #  include <sys/types.h>
+ #endif
+@@ -148,7 +153,11 @@
+ #if HAVE_VFORK
+ 	child = vfork();
+ #else
+-	child = fork();
++#ifdef TARGET_DARWIN_TVOS
++       child = -1;
++#else
++       child = fork();
++#endif
+ #endif
+ 	if (child == -1)
+ 		goto stdout_opened;
